@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -7,23 +8,39 @@ pipeline {
             steps {
                 sh 'whoami'
                 sh 'pwd'
+                sh 'node --version'
+                sh 'npm --version'
                 sh 'ls -la'
             }
         }
 
-        stage('Build') {
+        stage('Install Dependencies') {
             steps {
-                echo 'Building application...'
-                sh 'echo Build completed'
+                echo 'Installing backend dependencies...'
+                sh 'npm ci --prefix backend'
+
+                echo 'Installing frontend dependencies...'
+                sh 'npm ci --prefix frontend'
             }
         }
 
-        stage('Test') {
+        stage('Build Frontend') {
             steps {
-                echo 'Running tests...'
-                sh 'echo Tests passed'
+                echo 'Building frontend application...'
+                sh 'npm run build --prefix frontend'
             }
         }
+
+        stage('Test Backend') {
+            steps {
+                echo 'Validating backend JavaScript...'
+                sh 'node --check backend/server.js'
+            }
+        }
+
+       
 
     }
 }
+
+
